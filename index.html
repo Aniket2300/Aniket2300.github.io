@@ -647,6 +647,38 @@
     color:var(--text-dim);
   }
   .contact-links a:hover{color:var(--text);}
+  .email-copy-row{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .copy-icon-btn{
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    padding:4px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:6px;
+    transition:color 0.15s ease, background 0.15s ease;
+  }
+  .copy-icon-btn:hover{
+    color:var(--text);
+    background:var(--surface-2);
+  }
+  .copy-icon-btn.copied{
+    color:var(--green);
+  }
+  #emailBtn{
+    border:none;
+    font-family:inherit;
+    font-size:0.92rem;
+    cursor:pointer;
+  }
+  @media (pointer: fine){
+    #emailBtn, .copy-icon-btn{ cursor:none; }
+  }
 
   footer{
     padding:32px 0;
@@ -925,12 +957,19 @@
       <h2>Let's build something that explains itself.</h2>
       <p>Open to AI/ML, Machine Learning, and Data Science internships, plus software development roles.</p>
       <div class="contact-actions">
-        <a href="mailto:aniketjaiswal2300@gmail.com" class="btn btn-primary">Email me</a>
+        <button id="emailBtn" class="btn btn-primary" type="button">
+          <span id="emailBtnText">Email me</span>
+        </button>
         <a href="https://linkedin.com/in/Aniket-jaiswal67" target="_blank" rel="noopener" class="btn btn-secondary">LinkedIn</a>
         <a href="https://github.com/Aniket2300" target="_blank" rel="noopener" class="btn btn-secondary">GitHub</a>
       </div>
       <div class="contact-links">
-        <a href="mailto:aniketjaiswal2300@gmail.com">aniketjaiswal2300@gmail.com</a>
+        <span class="email-copy-row">
+          <a href="mailto:aniketjaiswal2300@gmail.com">aniketjaiswal2300@gmail.com</a>
+          <button id="copyEmailBtn" class="copy-icon-btn" type="button" title="Copy email" aria-label="Copy email address">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </span>
         <span>·</span>
         <a href="tel:9748143087">+91 97481 43087</a>
         <span>·</span>
@@ -1143,6 +1182,55 @@
       });
     });
   }
+
+  // ---------- Email button: try mailto, always copy as reliable fallback ----------
+  (function(){
+    const EMAIL = 'aniketjaiswal2300@gmail.com';
+
+    function copyToClipboard(text){
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        return navigator.clipboard.writeText(text);
+      }
+      // fallback for older/unsupported browsers
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      temp.style.position = 'fixed';
+      temp.style.opacity = '0';
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      return Promise.resolve();
+    }
+
+    const emailBtn = document.getElementById('emailBtn');
+    const emailBtnText = document.getElementById('emailBtnText');
+    if (emailBtn){
+      emailBtn.addEventListener('click', () => {
+        copyToClipboard(EMAIL).then(() => {
+          emailBtnText.textContent = 'Copied — ' + EMAIL;
+          setTimeout(() => { emailBtnText.textContent = 'Email me'; }, 2200);
+        });
+        // still attempt to open a mail client for anyone who has one configured
+        window.location.href = 'mailto:' + EMAIL;
+      });
+    }
+
+    const copyEmailBtn = document.getElementById('copyEmailBtn');
+    if (copyEmailBtn){
+      copyEmailBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        copyToClipboard(EMAIL).then(() => {
+          copyEmailBtn.classList.add('copied');
+          copyEmailBtn.setAttribute('title', 'Copied!');
+          setTimeout(() => {
+            copyEmailBtn.classList.remove('copied');
+            copyEmailBtn.setAttribute('title', 'Copy email');
+          }, 2000);
+        });
+      });
+    }
+  })();
 </script>
 
 </body>
